@@ -1,0 +1,38 @@
+services:
+  torproxy:
+    image: dperson/torproxy
+    ports:
+      - "8118:8118" # http proxy
+      - "9050:9050" # socks proxy
+      - "9051:9051" # control port
+    environment:
+      - PASSWORD=${TOR_CONTROL_PASSWORD:-password}
+    healthcheck:
+      test: ["CMD", "curl", "-X", "GET", "-x", "http://localhost:8118", "https://check.torproject.org/api/ip"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    networks:
+      net:
+        ipv4_address: 191.20.0.10
+  rotator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - RENEW_LEASE_SECONDS=${RENEW_LEASE_SECONDS:-15}
+      - TOR_CONTROL_PASSWORD=${TOR_CONTROL_PASSWORD:-password}
+    depends_on:
+      torproxy:
+        condition: service_healthy
+    restart:
+      on-failure
+    networks:
+      net:
+        ipv4_address: 191.20.0.11
+networks:
+  net:
+    ipam:
+      config:
+        - subnet: 191.20.0.0/24
