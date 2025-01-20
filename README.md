@@ -26,7 +26,7 @@ This project sets up a service that periodically changes the IP address used for
 For example:
 
 ```sh
-RENEW_LEASE_SECONDS=15 docker-compose up --remove-orphans --build
+RENEW_LEASE_SECONDS=15 docker compose up --remove-orphans --build
 ```
 
 The IP address will be renewed at the specified interval, and the new IP will be printed to the console.
