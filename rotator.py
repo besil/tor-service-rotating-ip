@@ -4,6 +4,7 @@ from stem import Signal
 from stem.control import Controller
 import os
 
+http_proxy_port: int = 8118
 control_port: int = 9051
 control_password: str = os.environ.get("TOR_CONTROL_PASSWORD", "password")
 tor_host: str = "191.20.0.10"  # fixed, change docker compose if you need it
@@ -21,12 +22,13 @@ def changeIP():
 
 
 if __name__ == "__main__":
-    print("Renewing lease every ", renew_lease, " seconds")
+    print("Renewing lease every ", renew_lease, " seconds. Use RENEW_LEASE_SECONDS env variable to change it.")
+    print("Exposed HTTP Proxy port: ", http_proxy_port)
     # new tor session
     tor_session = requests.session()
     tor_session.proxies = {
-        "http": f"http://{tor_host}:8118",
-        "https": f"http://{tor_host}:8118",
+        "http": f"http://{tor_host}:{http_proxy_port}",
+        "https": f"http://{tor_host}:{http_proxy_port}",
     }
 
     while True:
