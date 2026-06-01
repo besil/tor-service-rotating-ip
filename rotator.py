@@ -24,15 +24,16 @@ def changeIP():
 if __name__ == "__main__":
     print("Renewing lease every ", renew_lease, " seconds. Use RENEW_LEASE_SECONDS env variable to change it.")
     print("Exposed HTTP Proxy port: ", http_proxy_port)
-    # new tor session
-    tor_session = requests.session()
-    tor_session.proxies = {
-        "http": f"http://{tor_host}:{http_proxy_port}",
-        "https": f"http://{tor_host}:{http_proxy_port}",
-    }
 
     while True:
+        # new tor session
+        tor_session = requests.session()
+        tor_session.proxies = {
+            "http": f"http://{tor_host}:{http_proxy_port}",
+            "https": f"http://{tor_host}:{http_proxy_port}",
+        }
         time.sleep(renew_lease)
         changeIP()
         r = tor_session.get("http://httpbin.org/ip").json()
         print("New ip: ", r["origin"])
+        tor_session.close()
